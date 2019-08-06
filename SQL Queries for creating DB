@@ -1,0 +1,31 @@
+Here is a SQL queries for the AutomobileHelper:
+
+CREATE DATABASE AutoPartsHelp;
+
+USE AutoPartsHelp;
+CREATE TABLE Mileage(
+   ID   INT              NOT NULL,
+   mileageValue INT 	 NOT NULL,
+   dateStamp  date       NOT NULL,
+   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE Mileage(
+   ID   INT              NOT NULL,
+   partName varchar(25)  NOT NULL,
+   intervalValue INT     NOT NULL,
+   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE HistoryRecords(
+   ID   INT              NOT NULL,
+   partName varchar(25)  NOT NULL,
+   dateStamp date     	 NOT NULL,
+   mileageStamp double 	 NOT NULL,
+   partCost double,
+   serviceCost double,
+   commentText varchar(100),
+   PRIMARY KEY (ID)
+);
