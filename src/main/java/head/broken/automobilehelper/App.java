@@ -136,9 +136,8 @@ public class App extends Application {
                         // add warning pop-up message for user here in future
                     return;
                 }
-                    int intVal = Integer.parseInt(curIntervalValueArea.getText());      // get maintanance interval value
-                    dbHandle.setIntervalValue(partName, intVal);
-                    dbHandle.setIntervalAddInfo(partName, elementInfo);
+                    //int intVal = Integer.parseInt(curIntervalValueArea.getText());      
+                    dbHandle.createNewElement(partName, elementInfo);
                     System.out.println("--------> Save element info clicked, parameters passed");
                 } catch (NumberFormatException | NullPointerException nfe) {
                     System.out.println("----> Wrong input value");
@@ -234,7 +233,8 @@ public class App extends Application {
         tabPane.getTabs().add(tabAutoParts);
         tabPane.getTabs().add(tabSelections);
 
-        mileageArea.setText(dbHandle.getValuesOnStart());       //set up the last mileage value on start
+        mileageArea.setText(dbHandle.getLastMilesOnStart());       //set up the last mileage value on start
+        //add getter for auto elements list from DB
         Scene scene = new Scene(tabPane);
         stage.setScene(scene);
         stage.show();
