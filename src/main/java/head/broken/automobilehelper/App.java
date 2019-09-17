@@ -30,8 +30,8 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         Text curMileAgeText = new Text("Current mileage:");
-        Text curIntervalText = new Text("Maintenance interval:");
-        Text elementDicrText = new Text("Element additional info:");
+        //Text curIntervalText = new Text("Maintenance interval:");
+        Text elementDicrText = new Text("Element description:");
         Text creatRecordWelcome = new Text("Create a new record down below");
         Text elementsChoiceText = new Text("Choose an element:");
         Text mainChoiceText = new Text("Choose an element:");
@@ -40,28 +40,40 @@ public class App extends Application {
         Text recordsAreaText = new Text("Records:");
         Label curMileAgeValue = new Label(currentMileage + " units of length");
         Label elementCostLabel = new Label("Element cost: ");
-        Label maintenanceCostLabel = new Label("Maintenance cost: ");
+        Label maintenanceCostLabel = new Label("Service cost: ");
 
-        TextArea curIntervalValueArea = new TextArea(currentInterval + " units of length");
-        curIntervalValueArea.setMaxSize(100, 12);
+        //TextArea curIntervalValueArea = new TextArea(currentInterval + " units of length");
+        //curIntervalValueArea.setMaxSize(100, 12);
         TextArea mileageArea = new TextArea();
-        mileageArea.setMaxSize(100, 12);
+        mileageArea.setPromptText("Only numbers");
+        mileageArea.setMaxSize(110, 12);
+        
         TextArea elementCostArea = new TextArea();
-        elementCostArea.setMaxSize(100, 12);
-        TextArea maintenanceCostArea = new TextArea();
-        maintenanceCostArea.setMaxSize(100, 12);
+        elementCostArea.setMaxSize(110, 12);
+        elementCostArea.setPromptText("Only numbers");
+        
+        TextArea serviceCostArea = new TextArea();
+        serviceCostArea.setMaxSize(110, 5);
+        serviceCostArea.setPromptText("Only numbers");
+        
         TextArea recordsArea = new TextArea();           // output text area in History tab
         recordsArea.setMaxSize(400, 600);
+        
         TextArea elementDiscriptionArea = new TextArea();
         elementDiscriptionArea.setMaxSize(300, 100);
+        elementDiscriptionArea.setPromptText("Model, specific information, where you bought it, etc.");
+        
         TextArea comment = new TextArea();
-        comment.setPromptText("Type a commentary (max 100 symbols)");
-        comment.setMaxSize(350, 50);
+        comment.setPromptText("Type a commentary (max 200 symbols)");
+        comment.setMaxSize(350, 100);
 
-        // list of car elements
-        ObservableList<String> elementsList = FXCollections.observableArrayList("Engine Oil", "Oil filter", "Spark plug", "Air filter", "Coolant",
-                "Transmission Oil", "Fuses", "Wheels beerings", "Brake pads");
-
+        // list of car elements must be loaded from DB
+        /*ObservableList<String> elementsList = FXCollections.observableArrayList("Engine Oil", "Oil filter", "Spark plug", "Air filter", "Coolant",
+                "Transmission Oil", "Fuses", "Wheels beerings", "Brake pads");*/
+        
+        
+        ObservableList<String> elementsList = FXCollections.observableArrayList(dbHandle.getElementList());
+        
         ChoiceBox mainChoiceBox = new ChoiceBox();
         mainChoiceBox.getItems().addAll(elementsList);
         ChoiceBox elementsChoiceBox = new ChoiceBox();
@@ -73,7 +85,7 @@ public class App extends Application {
 
         Button refreshMileAge = new Button("Refresh\nmileage");
         Button makeARecordBtn = new Button("Make a\nrecord");
-        Button saveElementInfo = new Button("Save changes");
+        Button saveElementInfo = new Button("Save/Crete");
         Button sendHistoryRequest = new Button("Go!");
         //Button saveNewPart = new Button("Save part");  // for the future!
 
@@ -88,7 +100,7 @@ public class App extends Application {
                     curMileAgeValue.setText(newMileage + " units of length");
                     System.out.println("-----> Refresh mileage clicked, parameters passed");
                 } catch (NumberFormatException | NullPointerException nfe) {
-                    System.out.println("-----> Wrong input value");
+                    System.out.println("-----> Wrong input value, use only numbers");
                     // add warning pop-up message for user here in future
                     return;                                         
                 }
@@ -102,20 +114,16 @@ public class App extends Application {
             public void handle(MouseEvent event) {
                 String partName = elementsChoiceBox.getValue().toString();
                 String commentary = comment.getText();
-                if(commentary.contains("\"") ||commentary.contains("'")){
-                    System.out.println("-----> Make a record failed! Don't use single or double quotes in text, please!");
-                    // add warning pop-up message for user here in future
-                    return;
-                }
+                commentary.replaceAll("[^a-zA-Z0-9_-\\/]", ""); // remove from text bad symbols, that makes SQL anger! (single and double quotes)
                 // check correct input with try-catch
                 try {       
                     int mileageStamp = Integer.parseInt(mileageArea.getText());
                     double elemCost = Double.parseDouble(elementCostArea.getText());
-                    double maintanCost = Double.parseDouble(maintenanceCostArea.getText());
+                    double maintanCost = Double.parseDouble(serviceCostArea.getText());
                     dbHandle.createRecord(partName, mileageStamp, elemCost, maintanCost, commentary);
-                    System.out.println("-----> Make a record succeed, parameters passed");
+                    System.out.println("-----> Make a record succeed, data passed");
                 } catch (NumberFormatException | NullPointerException nfe) {    // if pasrers throws an exeption do not send anything
-                    System.out.println("-----> Wrong input value");
+                    System.out.println("-----> Wrong input value, use only numbers");
                     // add warning pop-up message for user here in future
                     return;                                         
                 }
@@ -131,16 +139,12 @@ public class App extends Application {
                 try {
                     String partName = elementsChoiceBox.getValue().toString();
                     String elementInfo = elementDiscriptionArea.getText();              // get element description
-                    if(elementInfo.contains("\"") || elementInfo.contains("'")){
-                        System.out.println("-----> Make a record failed! Don't use single or double quotes in text, please!");
-                        // add warning pop-up message for user here in future
-                    return;
-                }
-                    //int intVal = Integer.parseInt(curIntervalValueArea.getText());      
+                    partName.replaceAll("[^a-zA-Z0-9_-\\/]", "");
+                    elementInfo.replaceAll("[^a-zA-Z0-9_-\\/]", "");
                     dbHandle.createNewElement(partName, elementInfo);
                     System.out.println("--------> Save element info clicked, parameters passed");
                 } catch (NumberFormatException | NullPointerException nfe) {
-                    System.out.println("----> Wrong input value");
+                    System.out.println("-----> Wrong input value, use only numbers");
                     // add warning pop-up message for user here in future
                     return;      
                 }
@@ -157,11 +161,14 @@ public class App extends Application {
                 String selectType = selectTypeChoiceBox.getValue().toString();
                 if (selectType.equalsIgnoreCase("Last")) {
                     resultString = dbHandle.getLastRecordByName(partName);
+                    recordsArea.setText(resultString);
                 } else {
+                    // return all records here
+                    
                     resultString = dbHandle.getAllRecordsByName(partName);  // get all records does not work yet!
                 }
                 System.out.println("--------> Go! button clicked, parameters passed");
-                recordsArea.setText(resultString);               // put result into output text area
+                //recordsArea.setText(resultString);
             }
         }));
 
@@ -180,7 +187,7 @@ public class App extends Application {
         gridPaneMain.add(elementCostLabel, 0, 4);
         gridPaneMain.add(elementCostArea, 1, 4);
         gridPaneMain.add(maintenanceCostLabel, 0, 5);
-        gridPaneMain.add(maintenanceCostArea, 1, 5);
+        gridPaneMain.add(serviceCostArea, 1, 5);
         gridPaneMain.add(comment, 0, 6, 2, 1);
         gridPaneMain.add(makeARecordBtn, 0, 7);
 
@@ -191,11 +198,9 @@ public class App extends Application {
         gridPaneElements.setVgap(8);
         gridPaneElements.add(elementsChoiceText, 0, 0);
         gridPaneElements.add(elementsChoiceBox, 1, 0);
-        gridPaneElements.add(curIntervalText, 0, 1);
-        gridPaneElements.add(curIntervalValueArea, 1, 1);
-        gridPaneElements.add(elementDicrText, 0, 2);
-        gridPaneElements.add(elementDiscriptionArea, 0, 3, 2, 1);
-        gridPaneElements.add(saveElementInfo, 0, 4);
+        gridPaneElements.add(elementDicrText, 0, 1);
+        gridPaneElements.add(elementDiscriptionArea, 0, 2, 2, 1);
+        gridPaneElements.add(saveElementInfo, 0, 3);
 
         // Third tab "History"
         GridPane gridPaneHistory = new GridPane();
@@ -234,7 +239,7 @@ public class App extends Application {
         tabPane.getTabs().add(tabSelections);
 
         mileageArea.setText(dbHandle.getLastMilesOnStart());       //set up the last mileage value on start
-        //add getter for auto elements list from DB
+//add getter for auto elements list from DB
         Scene scene = new Scene(tabPane);
         stage.setScene(scene);
         stage.show();
