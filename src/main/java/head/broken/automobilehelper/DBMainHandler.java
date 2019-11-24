@@ -49,13 +49,12 @@ public class DBMainHandler {
     }
 
     public String getLastMilesOnStart() {
-        int lastMileageValue;
         String out = null;
         ResultSet result;
         try {
             String sqlTask = "SELECT MileageValue FROM AutomobileHelperDB.MileageHistory WHERE ID = (SELECT MAX(ID) FROM AutomobileHelperDB.MileageHistory);";
             result = stmt.executeQuery(sqlTask);
-            lastMileageValue = result.getInt("MileageValue");
+            int lastMileageValue = result.getInt("MileageValue");
             out = Integer.toString(lastMileageValue);
             result.close();
         } catch (SQLException ex) {
@@ -68,13 +67,11 @@ public class DBMainHandler {
     public ArrayList getElementList() {
         //what to return??
         ArrayList elementsFromDB = new ArrayList();
-        ResultSet result = null;
-        String elementName = new String();
         try {
             String sqlTask = "SELECT ElementName FROM AutomobileHelperDB.AutoElements;";
-            result = stmt.executeQuery(sqlTask);
+            ResultSet result = stmt.executeQuery(sqlTask);
             while (result.next()) {
-                elementName = result.getString("ElementName");
+                String elementName = result.getString("ElementName");
                 elementsFromDB.add(elementName);
             }
         } catch (SQLException ex) {
@@ -107,24 +104,17 @@ public class DBMainHandler {
     }
 
     public String getLastRecordByName(String partName) {    // for "History" tab, search last record by ID column
-        ResultSet result;
         String lastRecord = null;
-        String resultName = null;
-        String resultDate = null;
-        int resultMileage = 0;
-        double resultElCost = 0;
-        double resultMaintCost = 0;
-        String resultComment = null;
         try {
             String sqlTask = "SELECT ServiceCost, ElementCost, MileageStamp, DateStamp, Commentary FROM AutomobileHelperDB.ServiceHistory"
                     + " WHERE ElementName = '" + partName + "' AND ID = (SELECT MAX(ID) FROM AutomobileHelperDB.ServiceHistory) ;";
-            result = stmt.executeQuery(sqlTask);
-            resultName = result.getString("partName");
-            resultDate = result.getString("dateStamp");
-            resultMileage = result.getInt("mileageStamp");
-            resultElCost = result.getDouble("elementCost");
-            resultMaintCost = result.getDouble("maintenanceCost");
-            resultComment = result.getString("comment");
+            ResultSet result = stmt.executeQuery(sqlTask);
+            String resultName = result.getString("partName");
+            String resultDate = result.getString("dateStamp");
+            int resultMileage = result.getInt("mileageStamp");
+            double resultElCost = result.getDouble("elementCost");
+            double resultMaintCost = result.getDouble("maintenanceCost");
+            String resultComment = result.getString("comment");
             // make a super string with whole result, maybe use a StringBuilder?
             lastRecord = "Name: " + resultName + "; Date:" + resultDate + ", Mileage: " + resultMileage + " km; Element cost: " + resultElCost
                     + "; Maintenance cost:" + resultMaintCost + " \nCommentary: " + resultComment;
@@ -137,9 +127,9 @@ public class DBMainHandler {
 
     public String getAllRecordsByName(String partName) {
         ResultSet result;
-        StringBuilder superString = null;
+        StringBuilder superString = new StringBuilder();
         String sqlTask = "SELECT id, ServiceCost, ElementCost, MileageStamp, DateStamp, Commentary FROM AutomobileHelperDB.ServiceHistory"
-                        + "WHERE ElementName = '" + partName + "';";
+                + "WHERE ElementName = '" + partName + "';";
         try {
             result = stmt.executeQuery(sqlTask);
             while (result.next()) {
@@ -150,15 +140,19 @@ public class DBMainHandler {
                 String date = result.getString("DateStamp");
                 String comment = result.getString("Commentary");
                 superString.append("\\n---> Record №").append(id).append("\\nService cost:").append(serviceCost).append("\\n")
-                           .append("Element cost:").append(elementCost).append("\\n")
-                           .append("Mileage stamp:").append(miles).append("\\n")
-                           .append("Date stamp:").append(date).append("\\n")
-                           .append("Commentary:").append(comment).append("\\n");
+                        .append("Element cost:").append(elementCost).append("\\n")
+                        .append("Mileage stamp:").append(miles).append("\\n")
+                        .append("Date stamp:").append(date).append("\\n")
+                        .append("Commentary:").append(comment).append("\\n");
             }
         } catch (SQLException ex) {
             Logger.getLogger(DBMainHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return superString.toString();
+        if (superString.toString() != null) {
+            return superString.toString();
+        } else {
+            return "No results!";
+        }
     }
 
     public String getElementDesc(String partName) {

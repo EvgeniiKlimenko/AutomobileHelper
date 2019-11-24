@@ -26,11 +26,12 @@ public class App extends Application {
     private final DBMainHandler dbHandle = DBMainHandler.getInstance();
     public int currentMileage = 0;
     public int currentInterval = 0;
+    ClickerHandler click = new ClickerHandler();
+    
 
     @Override
     public void start(Stage stage) {
         Text curMileAgeText = new Text("Current mileage:");
-        //Text curIntervalText = new Text("Maintenance interval:");
         Text elementDicrText = new Text("Element description:");
         Text creatRecordWelcome = new Text("Create a new record down below");
         Text elementsChoiceText = new Text("Choose an element:");
@@ -42,8 +43,6 @@ public class App extends Application {
         Label elementCostLabel = new Label("Element cost: ");
         Label maintenanceCostLabel = new Label("Service cost: ");
 
-        //TextArea curIntervalValueArea = new TextArea(currentInterval + " units of length");
-        //curIntervalValueArea.setMaxSize(100, 12);
         TextArea mileageArea = new TextArea();
         mileageArea.setPromptText("Only numbers");
         mileageArea.setMaxSize(110, 12);
@@ -94,27 +93,30 @@ public class App extends Application {
         refreshMileAge.setOnMouseClicked((new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                click.refreshMileageBtn(mileageArea, curMileAgeValue);
+                /*
                 try {
                     int newMileage = Integer.parseInt(mileageArea.getText());
+                    System.out.println("-----> Refresh mileage clicked.");
                     dbHandle.saveMileage(newMileage);
                     curMileAgeValue.setText(newMileage + " units of length");
-                    System.out.println("-----> Refresh mileage clicked, parameters passed");
+                    System.out.println("-----> Refresh mileage successfully done.");
                 } catch (NumberFormatException | NullPointerException nfe) {
                     System.out.println("-----> Wrong input value, use only numbers");
-                    // add warning pop-up message for user here in future
-                    return;                                         
+                    // add warning pop-up message for user here in future                                          
                 }
-                System.out.println("-----> Save the mileage value failed, wrong parameters parsing");
+                */
             }
         }));
 
-        // Try to move logic to another method or class (For the future)
         makeARecordBtn.setOnMouseClicked((new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                click.makeARecordBtn(elementsChoiceBox, comment, mileageArea, elementCostArea, serviceCostArea);
+                /*
                 String partName = elementsChoiceBox.getValue().toString();
                 String commentary = comment.getText();
-                commentary.replaceAll("[^a-zA-Z0-9_-\\/]", ""); // remove from text bad symbols, that makes SQL anger! (single and double quotes)
+                commentary.replaceAll("[^a-zA-Z0-9\"\']", ""); // remove from text bad symbols, that makes SQL anger! (single and double quotes)
                 // check correct input with try-catch
                 try {       
                     int mileageStamp = Integer.parseInt(mileageArea.getText());
@@ -123,12 +125,10 @@ public class App extends Application {
                     dbHandle.createRecord(partName, mileageStamp, elemCost, maintanCost, commentary);
                     System.out.println("-----> Make a record succeed, data passed");
                 } catch (NumberFormatException | NullPointerException nfe) {    // if pasrers throws an exeption do not send anything
-                    System.out.println("-----> Wrong input value, use only numbers");
+                    System.out.println("-----> Wrong input value, use only numbers. Make a record failed.");
                     // add warning pop-up message for user here in future
-                    return;                                         
                 }
-                System.out.println("-----> Make a record failed, wrong parameters parsing");
-
+                */
             }
         }));
 
@@ -136,6 +136,8 @@ public class App extends Application {
         saveElementInfo.setOnMouseClicked((new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                click.saveElementBtn(elementsChoiceBox, elementDiscriptionArea);
+                /*
                 try {
                     String partName = elementsChoiceBox.getValue().toString();
                     String elementInfo = elementDiscriptionArea.getText();              // get element description
@@ -145,10 +147,9 @@ public class App extends Application {
                     System.out.println("--------> Save element info clicked, parameters passed");
                 } catch (NumberFormatException | NullPointerException nfe) {
                     System.out.println("-----> Wrong input value, use only numbers");
-                    // add warning pop-up message for user here in future
-                    return;      
+                    // add warning pop-up message for user here in future  
                 }
-                System.out.println("--------> Save part info failed, wrong parameters parsing");
+                */
             }
         }));
 
@@ -156,6 +157,8 @@ public class App extends Application {
         sendHistoryRequest.setOnMouseClicked((new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                click.historyRequestBtn(selectElemChoiceBox, selectTypeChoiceBox, recordsArea);
+                /*
                 String resultString = null;
                 String partName = selectElemChoiceBox.getValue().toString();
                 String selectType = selectTypeChoiceBox.getValue().toString();
@@ -169,6 +172,7 @@ public class App extends Application {
                 }
                 System.out.println("--------> Go! button clicked, parameters passed");
                 //recordsArea.setText(resultString);
+                */
             }
         }));
 
@@ -239,7 +243,6 @@ public class App extends Application {
         tabPane.getTabs().add(tabSelections);
 
         mileageArea.setText(dbHandle.getLastMilesOnStart());       //set up the last mileage value on start
-//add getter for auto elements list from DB
         Scene scene = new Scene(tabPane);
         stage.setScene(scene);
         stage.show();
