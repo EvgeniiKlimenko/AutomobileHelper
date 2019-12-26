@@ -25,24 +25,31 @@ public class App extends Application {
 
     private final DBMainHandler dbHandle = DBMainHandler.getInstance();
     public int currentMileage = 0;
-    public int currentInterval = 0;
     ClickerHandler click = new ClickerHandler();
     
 
     @Override
     public void start(Stage stage) {
-        Text curMileAgeText = new Text("Current mileage:");
+        Text curMileAgeText = new Text("Current mileage (units of length):");
         Text elementDicrText = new Text("Element description:");
-        Text creatRecordWelcome = new Text("Create a new record down below");
+        Text creatRecordWelcome = new Text("Create a new record down below:");
         Text elementsChoiceText = new Text("Choose an element:");
         Text mainChoiceText = new Text("Choose an element:");
+        Text newElementDicrText = new Text("New element description:");
+        
         Text selectsText1 = new Text("Select");
         Text selectsText2 = new Text("records for ");
         Text recordsAreaText = new Text("Records:");
-        Label curMileAgeValue = new Label(currentMileage + " units of length");
+        Text responseOnActionsMain = new Text("Tip: refresh mileage first before any other actions.");
+        Text responseOnActionsElements = new Text("Tip: don't forget to fill all the fields");
+        
+        Label curMileAgeValue = new Label(Integer.toString(currentMileage)); // BINGO!
         Label elementCostLabel = new Label("Element cost: ");
         Label maintenanceCostLabel = new Label("Service cost: ");
-
+        Label newElementWelcomeLabel = new Label("Create a new car's element down below: ");
+        Label newElementNameLabel = new Label("New element name: ");
+        
+        
         TextArea mileageArea = new TextArea();
         mileageArea.setPromptText("Only numbers");
         mileageArea.setMaxSize(110, 12);
@@ -55,8 +62,17 @@ public class App extends Application {
         serviceCostArea.setMaxSize(110, 5);
         serviceCostArea.setPromptText("Only numbers");
         
-        TextArea recordsArea = new TextArea();           // output text area in History tab
+        TextArea recordsArea = new TextArea();  // output text area in History tab
         recordsArea.setMaxSize(400, 600);
+        
+        TextArea newElementNameArea = new TextArea();
+        newElementNameArea.setMaxSize(180, 12);
+        newElementNameArea.setPromptText("Enter name of a part");
+        
+        TextArea newElementDiscrArea = new TextArea();
+        newElementDiscrArea.setMaxSize(300, 100);
+        newElementDiscrArea.setPromptText("Model, specific information, where you bought it, etc.");
+        
         
         TextArea elementDiscriptionArea = new TextArea();
         elementDiscriptionArea.setMaxSize(300, 100);
@@ -66,116 +82,66 @@ public class App extends Application {
         comment.setPromptText("Type a commentary (max 200 symbols)");
         comment.setMaxSize(350, 100);
 
-        // list of car elements must be loaded from DB
-        /*ObservableList<String> elementsList = FXCollections.observableArrayList("Engine Oil", "Oil filter", "Spark plug", "Air filter", "Coolant",
-                "Transmission Oil", "Fuses", "Wheels beerings", "Brake pads");*/
-        
-        
         ObservableList<String> elementsList = FXCollections.observableArrayList(dbHandle.getElementList());
         
         ChoiceBox mainChoiceBox = new ChoiceBox();
         mainChoiceBox.getItems().addAll(elementsList);
         ChoiceBox elementsChoiceBox = new ChoiceBox();
         elementsChoiceBox.getItems().addAll(elementsList);
-        ChoiceBox selectTypeChoiceBox = new ChoiceBox();        //type of history selection
+        ChoiceBox selectTypeChoiceBox = new ChoiceBox();        
         selectTypeChoiceBox.getItems().addAll("All", "Last");
         ChoiceBox selectElemChoiceBox = new ChoiceBox();        // element for history selections
         selectElemChoiceBox.getItems().addAll(elementsList);
 
         Button refreshMileAge = new Button("Refresh\nmileage");
         Button makeARecordBtn = new Button("Make a\nrecord");
-        Button saveElementInfo = new Button("Save/Crete");
+        Button saveElementInfo = new Button("Save updated info");
+        Button createElementBtn = new Button("Create new element");
         Button sendHistoryRequest = new Button("Go!");
-        //Button saveNewPart = new Button("Save part");  // for the future!
-
+        Button getElementInfoBtn = new Button("Get info!");
         
-        // Try to move logic to another method or class (For the future)
         refreshMileAge.setOnMouseClicked((new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                click.refreshMileageBtn(mileageArea, curMileAgeValue);
-                /*
-                try {
-                    int newMileage = Integer.parseInt(mileageArea.getText());
-                    System.out.println("-----> Refresh mileage clicked.");
-                    dbHandle.saveMileage(newMileage);
-                    curMileAgeValue.setText(newMileage + " units of length");
-                    System.out.println("-----> Refresh mileage successfully done.");
-                } catch (NumberFormatException | NullPointerException nfe) {
-                    System.out.println("-----> Wrong input value, use only numbers");
-                    // add warning pop-up message for user here in future                                          
-                }
-                */
+                click.refreshMileageBtn(mileageArea, curMileAgeValue, responseOnActionsMain);
             }
         }));
 
         makeARecordBtn.setOnMouseClicked((new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                click.makeARecordBtn(elementsChoiceBox, comment, mileageArea, elementCostArea, serviceCostArea);
-                /*
-                String partName = elementsChoiceBox.getValue().toString();
-                String commentary = comment.getText();
-                commentary.replaceAll("[^a-zA-Z0-9\"\']", ""); // remove from text bad symbols, that makes SQL anger! (single and double quotes)
-                // check correct input with try-catch
-                try {       
-                    int mileageStamp = Integer.parseInt(mileageArea.getText());
-                    double elemCost = Double.parseDouble(elementCostArea.getText());
-                    double maintanCost = Double.parseDouble(serviceCostArea.getText());
-                    dbHandle.createRecord(partName, mileageStamp, elemCost, maintanCost, commentary);
-                    System.out.println("-----> Make a record succeed, data passed");
-                } catch (NumberFormatException | NullPointerException nfe) {    // if pasrers throws an exeption do not send anything
-                    System.out.println("-----> Wrong input value, use only numbers. Make a record failed.");
-                    // add warning pop-up message for user here in future
-                }
-                */
+                click.makeARecordBtn(mainChoiceBox, comment, curMileAgeValue, elementCostArea, serviceCostArea, responseOnActionsMain);
             }
         }));
 
-        // Try to move logic to another method or class (For the future)
         saveElementInfo.setOnMouseClicked((new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                click.saveElementBtn(elementsChoiceBox, elementDiscriptionArea);
-                /*
-                try {
-                    String partName = elementsChoiceBox.getValue().toString();
-                    String elementInfo = elementDiscriptionArea.getText();              // get element description
-                    partName.replaceAll("[^a-zA-Z0-9_-\\/]", "");
-                    elementInfo.replaceAll("[^a-zA-Z0-9_-\\/]", "");
-                    dbHandle.createNewElement(partName, elementInfo);
-                    System.out.println("--------> Save element info clicked, parameters passed");
-                } catch (NumberFormatException | NullPointerException nfe) {
-                    System.out.println("-----> Wrong input value, use only numbers");
-                    // add warning pop-up message for user here in future  
-                }
-                */
+                click.saveElementBtn(elementsChoiceBox, elementDiscriptionArea, responseOnActionsElements);
             }
         }));
-
-        // Try to move logic to another method or class (For the future)
+        
+        createElementBtn.setOnMouseClicked((new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                click.createElementBtn(newElementNameArea, newElementDiscrArea, responseOnActionsElements);
+            }
+        }));
+        
         sendHistoryRequest.setOnMouseClicked((new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 click.historyRequestBtn(selectElemChoiceBox, selectTypeChoiceBox, recordsArea);
-                /*
-                String resultString = null;
-                String partName = selectElemChoiceBox.getValue().toString();
-                String selectType = selectTypeChoiceBox.getValue().toString();
-                if (selectType.equalsIgnoreCase("Last")) {
-                    resultString = dbHandle.getLastRecordByName(partName);
-                    recordsArea.setText(resultString);
-                } else {
-                    // return all records here
-                    
-                    resultString = dbHandle.getAllRecordsByName(partName);  // get all records does not work yet!
-                }
-                System.out.println("--------> Go! button clicked, parameters passed");
-                //recordsArea.setText(resultString);
-                */
             }
         }));
-
+        
+        getElementInfoBtn.setOnMouseClicked((new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                click.getElementDescr(elementsChoiceBox, elementDiscriptionArea);
+            }
+        }));
+        
         // First tab "Main"
         GridPane gridPaneMain = new GridPane();
         gridPaneMain.setPadding(new Insets(10, 10, 10, 10));
@@ -194,6 +160,7 @@ public class App extends Application {
         gridPaneMain.add(serviceCostArea, 1, 5);
         gridPaneMain.add(comment, 0, 6, 2, 1);
         gridPaneMain.add(makeARecordBtn, 0, 7);
+        gridPaneMain.add(responseOnActionsMain, 0, 8, 2, 1);
 
         // Second tab "Elements info"
         GridPane gridPaneElements = new GridPane();
@@ -202,9 +169,17 @@ public class App extends Application {
         gridPaneElements.setVgap(8);
         gridPaneElements.add(elementsChoiceText, 0, 0);
         gridPaneElements.add(elementsChoiceBox, 1, 0);
+        gridPaneElements.add(getElementInfoBtn, 2, 0);
         gridPaneElements.add(elementDicrText, 0, 1);
         gridPaneElements.add(elementDiscriptionArea, 0, 2, 2, 1);
         gridPaneElements.add(saveElementInfo, 0, 3);
+        gridPaneElements.add(newElementWelcomeLabel, 0, 4, 2, 1);
+        gridPaneElements.add(newElementNameLabel, 0, 5);
+        gridPaneElements.add(newElementNameArea, 1, 5, 2, 1);
+        gridPaneElements.add(newElementDicrText, 0, 6);
+        gridPaneElements.add(newElementDiscrArea, 0, 7, 2, 1);
+        gridPaneElements.add(createElementBtn, 0, 8);
+        gridPaneElements.add(responseOnActionsElements, 0, 9, 2, 1);
 
         // Third tab "History"
         GridPane gridPaneHistory = new GridPane();
@@ -218,8 +193,9 @@ public class App extends Application {
         gridPaneHistory.add(sendHistoryRequest, 0, 1);
         gridPaneHistory.add(recordsAreaText, 0, 3);
         gridPaneHistory.add(recordsArea, 0, 4, 4, 1);
-
+        
         TabPane tabPane = new TabPane();
+        
         Tab tabMain = new Tab();
         tabMain.setText("Main");
         tabMain.setGraphic(new Circle(0, 0, 5));
@@ -242,9 +218,10 @@ public class App extends Application {
         tabPane.getTabs().add(tabAutoParts);
         tabPane.getTabs().add(tabSelections);
 
-        mileageArea.setText(dbHandle.getLastMilesOnStart());       //set up the last mileage value on start
+        curMileAgeValue.setText(dbHandle.getLastMilesOnStart());       //set up the last mileage value on start
         Scene scene = new Scene(tabPane);
         stage.setScene(scene);
+        stage.setTitle("Automobile helper");
         stage.show();
     }
 

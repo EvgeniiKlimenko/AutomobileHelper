@@ -43,7 +43,7 @@
                 <version>0.0.1</version>
                 <configuration>
                     <mainClass>head.broken.automobilehelper.App</mainClass>
-                    <executable>/media/evgenij/Additional place/jdk-11.0.2/bin/java</executable>
+                    <executable>/usr/lib/jvm/java-11-openjdk-amd64/bin/java</executable>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,0 +1,27 @@
+CREATE DATABASE AutomobileSirDB;
+
+USE AutomobileSirDB;
+
+CREATE TABLE MileageHistory(
+   ID   int          NOT NULL AUTO_INCREMENT,
+   MileageValue int 	     NOT NULL,
+   DateStamp  date    NOT NULL,
+   PRIMARY KEY (ID)
+);
+
+CREATE TABLE AutoElements(
+   ID   	    int          NOT NULL AUTO_INCREMENT,
+   ElementName  int 	     NOT NULL,
+   ElementDesc  varchar(100),
+   PRIMARY KEY (ID)
+);
+
+CREATE TABLE ServiceHistory(
+   ID   	int     NOT NULL AUTO_INCREMENT,
+   ServiceCost  decimal(12,2),
+   ElementCost  decimal(12,2),
+   MileageStamp int 	     NOT NULL,
+   DateStamp    date	NOT NULL,
+   Commentary   varchar(200),
+   PRIMARY KEY (ID)
+);
