@@ -33,6 +33,7 @@ public class DBMainHandler {
         private static final DBMainHandler INSTANCE = new DBMainHandler();
     }
 
+    // constructor!
     private DBMainHandler() {
         try {
             Class.forName(JDBC_DRIVER);
