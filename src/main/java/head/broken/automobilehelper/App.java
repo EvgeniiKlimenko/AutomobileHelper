@@ -52,35 +52,44 @@ public class App extends Application {
         
         TextArea mileageArea = new TextArea();
         mileageArea.setPromptText("Only numbers");
-        mileageArea.setMaxSize(110, 12);
+        mileageArea.setPrefSize(110, 15);
+        //mileageArea.setMaxSize(110, 20);
         
         TextArea elementCostArea = new TextArea();
-        elementCostArea.setMaxSize(110, 12);
+        elementCostArea.setPrefSize(110, 15);
+        //elementCostArea.setMaxSize(110, 12);
         elementCostArea.setPromptText("Only numbers");
         
         TextArea serviceCostArea = new TextArea();
-        serviceCostArea.setMaxSize(110, 5);
+        serviceCostArea.setPrefSize(110, 15);
+        //serviceCostArea.setMaxSize(110, 5);
         serviceCostArea.setPromptText("Only numbers");
         
         TextArea recordsArea = new TextArea();  // output text area in History tab
-        recordsArea.setMaxSize(400, 600);
+        recordsArea.setPrefSize(400, 600);
+        //recordsArea.setMaxSize(400, 600);
         
         TextArea newElementNameArea = new TextArea();
-        newElementNameArea.setMaxSize(180, 12);
+        newElementNameArea.setPrefSize(150, 15);
+        //newElementNameArea.setMaxSize(180, 12);
         newElementNameArea.setPromptText("Enter name of a part");
         
         TextArea newElementDiscrArea = new TextArea();
-        newElementDiscrArea.setMaxSize(300, 100);
+        newElementDiscrArea.setPrefSize(300, 200);
+        //newElementDiscrArea.setMaxSize(300, 100);
         newElementDiscrArea.setPromptText("Model, specific information, where you bought it, etc.");
         
         
         TextArea elementDiscriptionArea = new TextArea();
-        elementDiscriptionArea.setMaxSize(300, 100);
+        elementDiscriptionArea.setPrefSize(300, 100);
+        //elementDiscriptionArea.setMaxSize(300, 100);
         elementDiscriptionArea.setPromptText("Model, specific information, where you bought it, etc.");
         
         TextArea comment = new TextArea();
+        //comment.setMaxSize(350, 100);
+        comment.setPrefSize(350, 100);
         comment.setPromptText("Type a commentary (max 200 symbols)");
-        comment.setMaxSize(350, 100);
+        
 
         ObservableList<String> elementsList = FXCollections.observableArrayList(dbHandle.getElementList());
         
@@ -221,7 +230,7 @@ public class App extends Application {
         curMileAgeValue.setText(dbHandle.getLastMilesOnStart());       //set up the last mileage value on start
         Scene scene = new Scene(tabPane);
         stage.setScene(scene);
-        stage.setTitle("Automobile helper");
+        stage.setTitle("Automobile helper " + SystemInfo.appVersion());
         stage.show();
     }
 

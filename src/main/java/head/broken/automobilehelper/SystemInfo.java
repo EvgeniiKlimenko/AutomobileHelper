@@ -10,4 +10,8 @@ public class SystemInfo {
         return System.getProperty("javafx.version");
     }
 
+    public static String appVersion() {
+        return "v0.3";
+    }
+    
 }
